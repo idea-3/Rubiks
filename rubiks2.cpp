@@ -140,6 +140,11 @@ void drawRubiks() {
         glRotatef(25+degrees[i][j][k][0],1,0,0);
         glRotatef(-30+degrees[i][j][k][1],0,1,0);
         glRotatef(degrees[i][j][k][2],0,0,1);
+        if (keyPressed == 'q') {
+          if (j == 2) {
+            glRotatef(theta, 0, 1, 0);
+          }
+        }
         drawCube(i, j, k);
       }
     }
