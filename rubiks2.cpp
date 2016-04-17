@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <GL/glut.h>
 
-GLfloat squareSize = 2, lineWidth = 3;
+GLfloat squareSize = 2, lineWidth = 10;
 GLfloat color[][3]={{1.0,1.0,1.0},  // White
                     {1.0,0.5,0.0},  // Orange
                     {0.0,0.0,1.0},  // Blue
@@ -19,6 +19,19 @@ int rotationSign = 0;
 int rubiksColor[6][9];
 int angleX = 0, angleY = 0, angleZ = 0;
 bool rotationComplete = true;
+
+/* 
+  PANDUAN MENGGAMBAR
+  Tampak atas rubiksColor[0][], bawah rubiksColor[1][], depan rubiksColor[2][]
+    6 7 8
+    3 4 5
+    0 1 2
+
+  Tampak belakang rubiksColor[3][], kiri rubiksColor[4][], kanan rubiksColor[5][]
+    8 7 6
+    5 4 3
+    2 1 0
+*/
 
 void initiateRubiksColor() {
   for (int i = 0; i < 6; i++) {
@@ -162,6 +175,46 @@ void drawRubiks() {
               glRotatef(theta, 0, 1, 0); 
             }
             break;
+          case 'a':
+            if (k == 0) {
+              glRotatef(-theta, 0, 0, 1);
+            }
+            break;
+          case 's':
+            if (k == 0) {
+              glRotatef(theta, 0, 0, 1);
+            }
+            break;
+          case 'd':
+            if (k == 2) {
+              glRotatef(-theta, 0, 0, 1);
+            }
+            break;
+          case 'f':
+            if (k == 2) {
+              glRotatef(theta, 0, 0, 1);
+            }
+            break;
+          case 'z':
+            if (i == 0) {
+              glRotatef(theta, 1, 0, 0);
+            }
+            break;
+          case 'x':
+            if (i == 0) {
+              glRotatef(-theta, 1, 0, 0);
+            }
+            break;
+          case 'c':
+            if (i == 2) {
+              glRotatef(theta, 1, 0, 0);
+            }
+            break;
+          case 'v':
+            if (i == 2) {
+              glRotatef(-theta, 1, 0, 0);
+            }
+            break;
         }
         drawCube(i, j, k);
       }
@@ -191,6 +244,12 @@ void display() {
   glutSwapBuffers();
 }
 
+/*
+  Memutar satu sisi kubus dengan posisi:
+  6 7 8
+  3 4 5
+  0 1 2
+*/
 void rotateColor(int edge) {
   int temp = rubiksColor[edge][0];
   rubiksColor[edge][0] = rubiksColor[edge][2];
@@ -205,55 +264,235 @@ void rotateColor(int edge) {
   rubiksColor[edge][3] = temp;
 }
 
+/*
+  Memutar satu sisi kubus dengan posisi:
+  8 7 6
+  5 4 3
+  2 1 0
+*/
+void rotateColorInverse(int edge) {
+  int temp = rubiksColor[edge][2];
+  rubiksColor[edge][2] = rubiksColor[edge][0];
+  rubiksColor[edge][0] = rubiksColor[edge][6];
+  rubiksColor[edge][6] = rubiksColor[edge][8];
+  rubiksColor[edge][8] = temp;
+
+  temp = rubiksColor[edge][5];
+  rubiksColor[edge][5] = rubiksColor[edge][1];
+  rubiksColor[edge][1] = rubiksColor[edge][3];
+  rubiksColor[edge][3] = rubiksColor[edge][7];
+  rubiksColor[edge][7] = temp;
+}
+
+/*
+  Tampak atas
+        3 -> No. Bidang rubiksColor[i][]
+      8 7 6 -> No. persegi rubiksColor[][j]
+    8       6
+  4 7       7 5
+    6       8
+      6 7 8
+        2
+*/
 void rotateTop() {
-  
   rotateColor(0);
-  int temp1, temp2, temp3;
-  temp1 = rubiksColor[2][6];
-  temp2 = rubiksColor[2][7];
-  temp3 = rubiksColor[2][8];
+  int temp[3];
 
-  rubiksColor[2][6] = rubiksColor[5][6];
+  for (int i=0; i<3; i++) {
+    temp[i] = rubiksColor[2][i+6];
+  }
+
+  rubiksColor[2][6] = rubiksColor[5][8];
   rubiksColor[2][7] = rubiksColor[5][7];
-  rubiksColor[2][8] = rubiksColor[5][8];
+  rubiksColor[2][8] = rubiksColor[5][6];
 
-  rubiksColor[5][6] = rubiksColor[3][6];
+  rubiksColor[5][8] = rubiksColor[3][6];
   rubiksColor[5][7] = rubiksColor[3][7];
-  rubiksColor[5][8] = rubiksColor[3][8];
+  rubiksColor[5][6] = rubiksColor[3][8];
 
-  rubiksColor[3][6] = rubiksColor[4][6];
+  rubiksColor[3][6] = rubiksColor[4][8];
   rubiksColor[3][7] = rubiksColor[4][7];
-  rubiksColor[3][8] = rubiksColor[4][8];
+  rubiksColor[3][8] = rubiksColor[4][6];
 
-  rubiksColor[4][6] = temp1;
-  rubiksColor[4][7] = temp2;
-  rubiksColor[4][8] = temp3;
+  rubiksColor[4][8] = temp[0];
+  rubiksColor[4][7] = temp[1];
+  rubiksColor[4][6] = temp[2];
 }
 
-void rotateButtom() {
-  rotateColor(1);
-  int temp1, temp2, temp3;
-  temp1 = rubiksColor[2][0];
-  temp2 = rubiksColor[2][1];
-  temp3 = rubiksColor[2][2];
+/*
+  Tampak atas
+        3 -> No. Bidang rubiksColor[i][]
+      2 1 0 -> No. persegi rubiksColor[][j]
+    2       0
+  4 1       1 5
+    0       2
+      0 1 2
+        2
+*/
+void rotateBottom() {
+  rotateColorInverse(1);
+  int temp[3];
+  for (int i=0; i<3; i++) {
+    temp[i] = rubiksColor[2][i];
+  }
 
-  rubiksColor[2][0] = rubiksColor[5][0];
+  rubiksColor[2][0] = rubiksColor[5][2];
   rubiksColor[2][1] = rubiksColor[5][1];
-  rubiksColor[2][2] = rubiksColor[5][2];
+  rubiksColor[2][2] = rubiksColor[5][0];
 
-  rubiksColor[5][0] = rubiksColor[3][0];
+  rubiksColor[5][2] = rubiksColor[3][0];
   rubiksColor[5][1] = rubiksColor[3][1];
-  rubiksColor[5][2] = rubiksColor[3][2];
+  rubiksColor[5][0] = rubiksColor[3][2];
 
-  rubiksColor[3][0] = rubiksColor[4][0];
+  rubiksColor[3][0] = rubiksColor[4][2];
   rubiksColor[3][1] = rubiksColor[4][1];
-  rubiksColor[3][2] = rubiksColor[4][2];
+  rubiksColor[3][2] = rubiksColor[4][0];
 
-  rubiksColor[4][0] = temp1;
-  rubiksColor[4][1] = temp2;
-  rubiksColor[4][2] = temp3;
+  rubiksColor[4][2] = temp[0];
+  rubiksColor[4][1] = temp[1];
+  rubiksColor[4][0] = temp[2];
 }
 
+/*
+  Tampak depan
+        0 -> No. Bidang rubiksColor[i][]
+      0 1 2 -> No. persegi rubiksColor[][j]
+    6       8
+  4 3       5 5
+    0       2
+      6 7 8
+        1
+*/
+void rotateFront() {
+  rotateColor(2);
+  int temp[3];
+  for (int i=0; i<3; i++) {
+    temp[i] = rubiksColor[0][i];
+  }
+
+  rubiksColor[0][0] = rubiksColor[4][0];
+  rubiksColor[0][1] = rubiksColor[4][3];
+  rubiksColor[0][2] = rubiksColor[4][6];
+
+  rubiksColor[4][0] = rubiksColor[1][8];
+  rubiksColor[4][3] = rubiksColor[1][7];
+  rubiksColor[4][6] = rubiksColor[1][6];
+
+  rubiksColor[1][8] = rubiksColor[5][8];
+  rubiksColor[1][7] = rubiksColor[5][5];
+  rubiksColor[1][6] = rubiksColor[5][2];
+
+  rubiksColor[5][8] = temp[0];
+  rubiksColor[5][5] = temp[1];
+  rubiksColor[5][2] = temp[2];
+}
+
+/*
+  Tampak depan
+        0 -> No. Bidang rubiksColor[i][]
+      6 7 8 -> No. persegi rubiksColor[][j]
+    8       6
+  4 5       3 5
+    2       0
+      0 1 2
+        1
+*/
+void rotateBack() {
+  rotateColorInverse(3);
+  int temp[3];
+
+  for (int i=0; i<3; i++) {
+    temp[i] = rubiksColor[0][i+6];
+  }
+
+  rubiksColor[0][6] = rubiksColor[4][2];
+  rubiksColor[0][7] = rubiksColor[4][5];
+  rubiksColor[0][8] = rubiksColor[4][8];
+
+  rubiksColor[4][2] = rubiksColor[1][2];
+  rubiksColor[4][5] = rubiksColor[1][1];
+  rubiksColor[4][8] = rubiksColor[1][0];
+
+  rubiksColor[1][2] = rubiksColor[5][6];
+  rubiksColor[1][1] = rubiksColor[5][3];
+  rubiksColor[1][0] = rubiksColor[5][0];
+
+  rubiksColor[5][6] = temp[0];
+  rubiksColor[5][3] = temp[1];
+  rubiksColor[5][0] = temp[2];
+}
+
+/*
+  Tampak kiri
+        0 -> No. Bidang rubiksColor[i][]
+      6 3 0 -> No. persegi rubiksColor[][j]
+    8       6
+  3 5       3 2
+    2       0
+      0 3 6
+        1
+*/
+void rotateLeft() {
+  rotateColorInverse(4);
+  int temp[3];
+
+  temp[0] = rubiksColor[0][6];
+  temp[1] = rubiksColor[0][3];
+  temp[2] = rubiksColor[0][0];
+
+  rubiksColor[0][6] = rubiksColor[3][2];
+  rubiksColor[0][3] = rubiksColor[3][5];
+  rubiksColor[0][0] = rubiksColor[3][8];
+
+  rubiksColor[3][2] = rubiksColor[1][6];
+  rubiksColor[3][5] = rubiksColor[1][3];
+  rubiksColor[3][8] = rubiksColor[1][0];
+
+  for (int i=0; i<=6; i+=3) {
+    rubiksColor[1][i] = rubiksColor[2][i];
+  }
+
+  rubiksColor[2][6] = temp[0];
+  rubiksColor[2][3] = temp[1];
+  rubiksColor[2][0] = temp[2];
+}
+
+/*
+  Tampak kiri
+        0 -> No. Bidang rubiksColor[i][]
+      8 5 2 -> No. persegi rubiksColor[][j]
+    6       8
+  3 3       5 2
+    0       2
+      2 5 8
+        1
+*/
+void rotateRight() {
+  rotateColor(5);
+  int temp[3];
+
+  temp[0] = rubiksColor[0][8];
+  temp[1] = rubiksColor[0][5];
+  temp[2] = rubiksColor[0][2];
+
+  rubiksColor[0][8] = rubiksColor[3][0];
+  rubiksColor[0][5] = rubiksColor[3][3];
+  rubiksColor[0][2] = rubiksColor[3][6];
+
+  rubiksColor[3][0] = rubiksColor[1][8];
+  rubiksColor[3][3] = rubiksColor[1][5];
+  rubiksColor[3][6] = rubiksColor[1][2];
+
+  for (int i=2; i<=8; i+=3) {
+    rubiksColor[1][i] = rubiksColor[2][i];
+  }
+
+  rubiksColor[2][8] = temp[0];
+  rubiksColor[2][5] = temp[1];
+  rubiksColor[2][2] = temp[2];
+}
+
+// Memutar bagian rubiks sesuai masukkan keyboard pengguna
 void rotate() {
   theta += 0.5;
 
@@ -274,12 +513,44 @@ void rotate() {
         rotateTop();
         break;
       case 'e':
-        rotateButtom();
+        rotateBottom();
         break;
       case 'r':
-        rotateButtom();
-        rotateButtom();
-        rotateButtom();
+        rotateBottom();
+        rotateBottom();
+        rotateBottom();
+        break;
+      case 'a':
+        rotateFront();
+        break;
+      case 's':
+        rotateFront();
+        rotateFront();
+        rotateFront();
+        break;
+      case 'd':
+        rotateBack();
+        break;
+      case 'f':
+        rotateBack();
+        rotateBack();
+        rotateBack();
+        break;
+      case 'z':
+        rotateLeft();
+        break;
+      case 'x':
+        rotateLeft();
+        rotateLeft();
+        rotateLeft();
+        break;
+      case 'c':
+        rotateRight();
+        break;
+      case 'v':
+        rotateRight();
+        rotateRight();
+        rotateRight();
         break;
     }
     theta = 0;
@@ -287,6 +558,7 @@ void rotate() {
   glutPostRedisplay();
 }
 
+// Memutar bagian rubiks dan memutar seluruh bagian rubiks sesuai masukkan pengguna
 void keyboardFunc(unsigned char key, int x, int y) {
   switch (key) {
     case '1':
@@ -333,6 +605,46 @@ void keyboardFunc(unsigned char key, int x, int y) {
       rotationComplete = false;
       glutIdleFunc(rotate);
       break;
+    case 'a':
+      keyPressed = 'a';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
+    case 's':
+      keyPressed = 's';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
+    case 'd':
+      keyPressed = 'd';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
+    case 'f':
+      keyPressed = 'f';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
+    case 'z':
+      keyPressed = 'z';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
+    case 'x':
+      keyPressed = 'x';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
+    case 'c':
+      keyPressed = 'c';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
+    case 'v':
+      keyPressed = 'v';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
   }
 }
 
@@ -342,7 +654,7 @@ int main(int argc, char** argv) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowSize(500, 500);
   glutInitWindowPosition(100, 0);
-  glutCreateWindow("RUBIK'S CUBE");
+  glutCreateWindow("IDEA'S RUBIKS");
   glutReshapeFunc(reshape);
   glutDisplayFunc(display);
   glutKeyboardFunc(keyboardFunc);
