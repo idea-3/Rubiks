@@ -13,10 +13,11 @@ GLfloat color[][3]={{1.0,1.0,1.0},  // White
                     {1.0,0.0,0.0},  // Red
                     {0.5,0.5,0.5} // Grey
 };
-GLfloat degrees[3][3][3][3], theta = 0;
+GLfloat theta = 0;
 char keyPressed;
 int rotationSign = 0;
 int rubiksColor[6][9];
+int angleX = 0, angleY = 0, angleZ = 0;
 bool rotationComplete = true;
 
 void initiateRubiksColor() {
@@ -137,13 +138,30 @@ void drawRubiks() {
     for (int j = 0; j < 3; j++) {
       for (int k = 0; k < 3; k++) {
         glLoadIdentity();
-        glRotatef(25+degrees[i][j][k][0],1,0,0);
-        glRotatef(-30+degrees[i][j][k][1],0,1,0);
-        glRotatef(degrees[i][j][k][2],0,0,1);
-        if (keyPressed == 'q') {
-          if (j == 2) {
-            glRotatef(theta, 0, 1, 0);
-          }
+        glRotatef(25+angleX,1,0,0);
+        glRotatef(-30+angleY,0,1,0);
+        glRotatef(angleZ,0,0,1);
+        switch (keyPressed) {
+          case 'q':
+            if (j == 2) {
+              glRotatef(-theta, 0, 1, 0); 
+            }
+            break;
+          case 'w':
+            if (j == 2) {
+              glRotatef(theta, 0, 1, 0); 
+            }
+            break;
+          case 'e':
+            if (j == 0) {
+              glRotatef(-theta, 0, 1, 0); 
+            }
+            break;
+          case 'r':
+            if (j == 0) {
+              glRotatef(theta, 0, 1, 0); 
+            }
+            break;
         }
         drawCube(i, j, k);
       }
@@ -272,63 +290,27 @@ void rotate() {
 void keyboardFunc(unsigned char key, int x, int y) {
   switch (key) {
     case '1':
-      for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-          for (int k = 0; k < 3; k++) {
-            degrees[i][j][k][0] += 5;
-          }
-        }
-      }
+      angleX += 5;
       glutPostRedisplay();
       break;
     case '2':
-      for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-          for (int k = 0; k < 3; k++) {
-            degrees[i][j][k][0] -= 5;
-          }
-        }
-      }
+      angleX -= 5;
       glutPostRedisplay();
       break;
     case '3':
-      for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-          for (int k = 0; k < 3; k++) {
-            degrees[i][j][k][1] += 5;
-          }
-        }
-      }
+      angleY += 5;
       glutPostRedisplay();
       break;
     case '4':
-      for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-          for (int k = 0; k < 3; k++) {
-            degrees[i][j][k][1] -= 5;
-          }
-        }
-      }
+      angleY -= 5;
       glutPostRedisplay();
       break;
     case '5':
-      for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-          for (int k = 0; k < 3; k++) {
-            degrees[i][j][k][2] += 5;
-          }
-        }
-      }
+      angleZ += 5;
       glutPostRedisplay();
       break;
     case '6':
-      for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-          for (int k = 0; k < 3; k++) {
-            degrees[i][j][k][2] -= 5;
-          }
-        }
-      }
+      angleZ -= 5;
       glutPostRedisplay();
       break;
     case 'q':
@@ -354,20 +336,7 @@ void keyboardFunc(unsigned char key, int x, int y) {
   }
 }
 
-void initiateDegrees() {
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      for (int k = 0; k < 3; k++) {
-        for (int l = 0; l < 3; l++) {
-          degrees[i][j][k][l] = 0;
-        }
-      }
-    }
-  }
-}
-
 int main(int argc, char** argv) {
-  initiateDegrees();
   initiateRubiksColor();
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
