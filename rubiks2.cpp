@@ -68,7 +68,13 @@ void drawCube(int i, int j, int k) {
   P3[2] -= squareSize;
   P4[2] -= squareSize;
   if (k == 2) {
-    drawSquare(P1,P2,P3,P4,rubiksColor[3][i + j * 3]);
+    int temp = 1;
+    if (i == 0) {
+      temp = 2;
+    } else if (i == 2) {
+      temp = 0;
+    }
+    drawSquare(P1,P2,P3,P4,rubiksColor[3][temp + j * 3]);
   } else {
     drawSquare(P1,P2,P3,P4,6);
   }
@@ -88,7 +94,13 @@ void drawCube(int i, int j, int k) {
   P3[1] -= squareSize;
   P4[1] -= squareSize;
   if (j == 0) {
-    drawSquare(P1,P2,P3,P4,rubiksColor[1][i + k * 3]);
+    int temp = 1;
+    if (k == 0) {
+      temp = 2;
+    } else if (k == 2) {
+      temp = 0;
+    }
+    drawSquare(P1,P2,P3,P4,rubiksColor[1][i + temp * 3]);
   } else {
     drawSquare(P1,P2,P3,P4,6);
   }
@@ -108,7 +120,13 @@ void drawCube(int i, int j, int k) {
   P3[0] += squareSize;
   P4[0] += squareSize;
   if (i == 2) {
-    drawSquare(P1,P2,P3,P4,rubiksColor[5][k + j * 3]);
+    int temp = 1;
+    if (k == 0) {
+      temp = 2;
+    } else if (k == 2) {
+      temp = 0;
+    }
+    drawSquare(P1,P2,P3,P4,rubiksColor[5][temp + j * 3]);
   } else {
     drawSquare(P1,P2,P3,P4,6);
   }
@@ -184,27 +202,36 @@ void rotateTop() {
   rubiksColor[3][7] = rubiksColor[4][7];
   rubiksColor[3][8] = rubiksColor[4][8];
 
-  rubiksColor[3][6] = temp1;
-  rubiksColor[3][7] = temp2;
-  rubiksColor[3][8] = temp3;
+  rubiksColor[4][6] = temp1;
+  rubiksColor[4][7] = temp2;
+  rubiksColor[4][8] = temp3;
+}
+
+void rotateButtom() {
+  rotateColor(1);
+  int temp1, temp2, temp3;
+  temp1 = rubiksColor[2][0];
+  temp2 = rubiksColor[2][1];
+  temp3 = rubiksColor[2][2];
+
+  rubiksColor[2][0] = rubiksColor[5][0];
+  rubiksColor[2][1] = rubiksColor[5][1];
+  rubiksColor[2][2] = rubiksColor[5][2];
+
+  rubiksColor[5][0] = rubiksColor[3][0];
+  rubiksColor[5][1] = rubiksColor[3][1];
+  rubiksColor[5][2] = rubiksColor[3][2];
+
+  rubiksColor[3][0] = rubiksColor[4][0];
+  rubiksColor[3][1] = rubiksColor[4][1];
+  rubiksColor[3][2] = rubiksColor[4][2];
+
+  rubiksColor[4][0] = temp1;
+  rubiksColor[4][1] = temp2;
+  rubiksColor[4][2] = temp3;
 }
 
 void rotate() {
-  // if (rotationSign >= 180) {
-  //   rotationSign = 0;
-  //   glutIdleFunc(NULL);
-  // } else {
-  //   if (keyPressed == 'q') {
-  //     for (int i = 0; i < 3; i++) {
-  //       for (int k = 0; k < 3; k++) {
-  //         degrees[i][2][k][1] += 0.5;
-  //       }
-  //     }
-  //   }
-  //   rotationSign++;
-  //   glutPostRedisplay();
-  // }
-
   theta += 0.5;
 
   if (theta == 360) {
@@ -214,9 +241,23 @@ void rotate() {
   if (theta >= 90) {
     rotationComplete = true;
     glutIdleFunc(NULL);
-
-    if (keyPressed == 'q') {
-      rotateTop();
+    switch (keyPressed) {
+      case 'q':
+        rotateTop();
+        break;
+      case 'w':
+        rotateTop();
+        rotateTop();
+        rotateTop();
+        break;
+      case 'e':
+        rotateButtom();
+        break;
+      case 'r':
+        rotateButtom();
+        rotateButtom();
+        rotateButtom();
+        break;
     }
     theta = 0;
   }
@@ -287,6 +328,21 @@ void keyboardFunc(unsigned char key, int x, int y) {
       break;
     case 'q':
       keyPressed = 'q';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
+    case 'w':
+      keyPressed = 'w';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
+    case 'e':
+      keyPressed = 'e';
+      rotationComplete = false;
+      glutIdleFunc(rotate);
+      break;
+    case 'r':
+      keyPressed = 'r';
       rotationComplete = false;
       glutIdleFunc(rotate);
       break;
