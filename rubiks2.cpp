@@ -18,7 +18,8 @@ char keyPressed;
 int rotationSign = 0;
 int rubiksColor[6][9];
 int angleX = 0, angleY = 0, angleZ = 0;
-bool rotationComplete = true;
+int xRot = 25, yRot = -30, xDiff = 0, yDiff = 0;
+bool rotationComplete = true, mouseDown = false;
 
 /* 
   PANDUAN MENGGAMBAR
@@ -151,8 +152,8 @@ void drawRubiks() {
     for (int j = 0; j < 3; j++) {
       for (int k = 0; k < 3; k++) {
         glLoadIdentity();
-        glRotatef(25+angleX,1,0,0);
-        glRotatef(-30+angleY,0,1,0);
+        glRotatef(xRot+angleX,1,0,0);
+        glRotatef(yRot+angleY,0,1,0);
         glRotatef(angleZ,0,0,1);
         switch (keyPressed) {
           case 'q':
@@ -648,6 +649,24 @@ void keyboardFunc(unsigned char key, int x, int y) {
   }
 }
 
+void mouse(int button, int state, int x, int y) {
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    mouseDown = true;
+    xDiff = x - yRot;
+    yDiff = -y + xRot;
+  } else {
+    mouseDown = false; 
+  }
+}
+
+void mouseMotion(int x, int y) {
+  if (mouseDown) {
+    xRot = y + yDiff;
+    yRot = x - xDiff;
+    glutPostRedisplay();
+  }
+}
+
 int main(int argc, char** argv) {
   initiateRubiksColor();
   glutInit(&argc, argv);
@@ -658,6 +677,8 @@ int main(int argc, char** argv) {
   glutReshapeFunc(reshape);
   glutDisplayFunc(display);
   glutKeyboardFunc(keyboardFunc);
+  glutMouseFunc(mouse);
+  glutMotionFunc(mouseMotion);
   glEnable(GL_DEPTH_TEST);
   glutMainLoop();
   return 0;
