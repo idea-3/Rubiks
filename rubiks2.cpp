@@ -3,6 +3,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <GL/glut.h>
+#include <GL/glext.h>
+#include <stdint.h>
+#include <fstream>
+#include <iostream>
+
+using namespace std;
 
 GLfloat squareSize = 2, lineWidth = 10;
 GLfloat color[][3]={{1.0,1.0,1.0},  // White
@@ -13,10 +19,14 @@ GLfloat color[][3]={{1.0,1.0,1.0},  // White
                     {1.0,0.0,0.0},  // Red
                     {0.5,0.5,0.5} // Grey
 };
+
+string textures[7]={"white.bmp", "orange.bmp", "blue.bmp", "green.bmp", "yellow.bmp", "red.bmp", "grey.bmp"};
+
 GLfloat theta = 0;
 char keyPressed;
 int rotationSign = 0;
-int rubiksColor[6][9];
+//int rubiksColor[6][9];
+GLuint rubiksColor[6][9];
 int angleX = 0, angleY = 0, angleZ = 0;
 int xRot = 25, yRot = -30, xDiff = 0, yDiff = 0;
 bool rotationComplete = true, mouseDown = false;
@@ -34,32 +44,106 @@ bool rotationComplete = true, mouseDown = false;
     2 1 0
 */
 
+GLuint LoadBMP(const char *fileName)
+{
+  FILE *file;
+  unsigned char header[54];
+  unsigned int dataPos;
+  unsigned int size;
+  unsigned int width, height;
+  unsigned char *data;
+  
+
+  file = fopen(fileName, "rb");
+
+  if (file == NULL)
+  {
+    cout << "Error: Invaild file path!" << endl;
+    return false;
+  }
+
+  if (fread(header, 1, 54, file) != 54)
+  {
+    cout << "Error: Invaild file!" << endl;;
+    return false;
+  }
+
+  if (header[0] != 'B' || header[1] != 'M')
+  {
+    cout << "Error: Invaild file!" << endl;
+    return false;
+  }
+
+  dataPos   = *(int*)&(header[0x0A]);
+  size    = *(int*)&(header[0x22]);
+  width   = *(int*)&(header[0x12]);
+  height    = *(int*)&(header[0x16]);
+
+  if (size == 0)
+    size = width * height * 3;
+  if (dataPos == 0)
+    dataPos = 54;
+
+  data = new unsigned char[size];
+
+  fread(data, 1, size, file);
+
+  fclose(file);
+
+  GLuint texture;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+  return texture;
+}
+
 void initiateRubiksColor() {
   for (int i = 0; i < 6; i++) {
+    // char *location = new char[textures[i].length() + 1];
+    // strcpy(location, textures[i].c_str());
+    // GLuint texture = 4721584/*= LoadBMP(location)*/;
+    // cout << LoadBMP(location) << endl;
     for (int j = 0; j < 9; j++) {
       rubiksColor[i][j] = i;
     }
+    //delete [] location;
   }
 }
 
+
 void drawSquare(GLfloat P1[], GLfloat P2[], GLfloat P3[], GLfloat P4[], int colorIndex) {
   // Membuat garis luar kotak
-  glColor3f(0, 0, 0);
-  glLineWidth(lineWidth);
-  glBegin(GL_LINE_LOOP);
-  glVertex3fv(P1);
-  glVertex3fv(P2);
-  glVertex3fv(P3);
-  glVertex3fv(P4);
-  glEnd();
+  // glColor3f(0, 0, 0);
+  // glLineWidth(lineWidth);
+  // glBegin(GL_LINE_LOOP);
+  // glVertex3fv(P1);
+  // glVertex3fv(P2);
+  // glVertex3fv(P3);
+  // glVertex3fv(P4);
+  // glEnd();
   // Membuat kotak
-  glColor3fv(color[colorIndex]);
+  char *location = new char[textures[colorIndex].length() + 1];
+  strcpy(location, textures[colorIndex].c_str());
+  GLuint texture = LoadBMP(location);
+  glEnable(GL_TEXTURE_2D);
+  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,GL_REPLACE);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  // glColor3fv(color[colorIndex]);
   glBegin(GL_POLYGON);
+  glTexCoord2i(0, 0);
   glVertex3fv(P1);
+  glTexCoord2i(0, 1);
   glVertex3fv(P2);
+  glTexCoord2i(1, 1);
   glVertex3fv(P3);
+  glTexCoord2i(1, 0);
   glVertex3fv(P4);
   glEnd();
+  glDisable(GL_TEXTURE_2D);
+  
 }
 
 void drawCube(int i, int j, int k) {
