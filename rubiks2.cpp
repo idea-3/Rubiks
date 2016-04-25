@@ -97,6 +97,7 @@ GLuint LoadBMP(const char *fileName)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
+  delete [] data;
   return texture;
 }
 
@@ -143,7 +144,8 @@ void drawSquare(GLfloat P1[], GLfloat P2[], GLfloat P3[], GLfloat P4[], int colo
   glVertex3fv(P4);
   glEnd();
   glDisable(GL_TEXTURE_2D);
-  
+  glDeleteTextures(1, &texture);
+  delete [] location;
 }
 
 void drawCube(int i, int j, int k) {
@@ -579,7 +581,7 @@ void rotateRight() {
 
 // Memutar bagian rubiks sesuai masukkan keyboard pengguna
 void rotate() {
-  theta += 0.5;
+  theta += 20.0;
 
   if (theta == 360) {
     theta -= 360;
