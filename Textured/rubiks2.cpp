@@ -117,14 +117,14 @@ void initiateRubiksColor() {
 
 void drawSquare(GLfloat P1[], GLfloat P2[], GLfloat P3[], GLfloat P4[], int colorIndex) {
   // Membuat garis luar kotak
-  // glColor3f(0, 0, 0);
-  // glLineWidth(lineWidth);
-  // glBegin(GL_LINE_LOOP);
-  // glVertex3fv(P1);
-  // glVertex3fv(P2);
-  // glVertex3fv(P3);
-  // glVertex3fv(P4);
-  // glEnd();
+  glColor3f(0, 0, 0);
+  glLineWidth(lineWidth);
+  glBegin(GL_LINE_LOOP);
+  glVertex3fv(P1);
+  glVertex3fv(P2);
+  glVertex3fv(P3);
+  glVertex3fv(P4);
+  glEnd();
   // Membuat kotak
   char *location = new char[textures[colorIndex].length() + 1];
   strcpy(location, textures[colorIndex].c_str());
