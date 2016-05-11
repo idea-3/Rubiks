@@ -20,6 +20,7 @@ int rubiksColor[6][9];
 int angleX = 0, angleY = 0, angleZ = 0;
 int xRot = 0, yRot = 0, xDiff = 0, yDiff = 0;
 bool rotationComplete = true, mouseDown = false;
+float rLight = 1, gLight = 1, bLight = 1;
 
 /* 
   PANDUAN MENGGAMBAR
@@ -262,10 +263,35 @@ void reshape(int width, int height) {
   glMatrixMode(GL_MODELVIEW);
 }
 
+// Membuat lighting
+void addLighting() {
+  glShadeModel(GL_SMOOTH);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  glEnable(GL_LIGHT1);
+  glEnable(GL_COLOR_MATERIAL);
+
+  GLfloat ambientLight[] = { 0.1f, 0.1f, 0.1f };
+  GLfloat diffuseLight[] = { rLight, gLight, bLight };
+  GLfloat specularLight[] = { rLight, gLight, bLight };
+  GLfloat position[][4] = { {-3.0f, 3.0f, 5.0f, 1.0f}, {3.0f, 3.0f, 5.0f, 1.0f} };
+
+  glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+  glLightfv(GL_LIGHT0, GL_POSITION, position[0]);
+
+  glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight);
+  glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight);
+  glLightfv(GL_LIGHT1, GL_POSITION, position[1]);
+}
+
 void display() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
   glPushMatrix();
+  addLighting();
   drawRubiks();
   glPopMatrix();
   glFlush();
@@ -613,6 +639,18 @@ void keyboardFunc(unsigned char key, int x, int y) {
       angleZ -= 5;
       glutPostRedisplay();
       break;
+    case '=':
+      rLight += 0.1f;
+      gLight += 0.1f;
+      bLight += 0.1f;
+      glutPostRedisplay();
+      break;
+    case '-':
+      rLight -= 0.1f;
+      gLight -= 0.1f;
+      bLight -= 0.1f;
+      glutPostRedisplay();
+      break;
     case 'q':
       keyPressed = 'q';
       rotationComplete = false;
@@ -692,30 +730,6 @@ void mouseMotion(int x, int y) {
     yRot = x - xDiff;
     glutPostRedisplay();
   }
-}
-
-// Membuat lighting
-void addLighting() {
-  glShadeModel(GL_SMOOTH);
-  glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
-  glEnable(GL_LIGHT1);
-  glEnable(GL_COLOR_MATERIAL);
-
-  GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-  GLfloat diffuseLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-  GLfloat specularLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-  GLfloat position[][4] = { {-3.0f, 3.0f, 5.0f, 1.0f}, {3.0f, 3.0f, 5.0f, 1.0f} };
-
-  glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-  glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-  glLightfv(GL_LIGHT0, GL_POSITION, position[0]);
-
-  glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight);
-  glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight);
-  glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight);
-  glLightfv(GL_LIGHT1, GL_POSITION, position[1]);
 }
 
 int main(int argc, char** argv) {
