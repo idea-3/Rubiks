@@ -54,11 +54,11 @@ void drawSquare(GLfloat P1[], GLfloat P2[], GLfloat P3[], GLfloat P4[], int colo
   glVertex3fv(P4);
   glEnd();
   // Membuat kotak
-  float specReflection[] = { 0.3f, 0.3f, 0.3f, 0.1f };
+  float specReflection[] = { 1.0f, 1.0f, 1.0f, 0.1f };
   glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
-  glMateriali(GL_FRONT, GL_SHININESS, 2);
+  glMateriali(GL_FRONT, GL_SHININESS, 128);
 
-  // glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
   glColor3fv(color[colorIndex]);
   glBegin(GL_POLYGON);
 
@@ -703,9 +703,9 @@ void addLighting() {
   glEnable(GL_COLOR_MATERIAL);
 
   GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-  GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
-  GLfloat specularLight[] = { 1.0f, 1.0f, 1.0f, 0.5f };
-  GLfloat position[][4] = { {0.0f, 4.0f, 0.0f, 1.0f}, {0.0f, -4.0f, 0.0f, 1.0f} };
+  GLfloat diffuseLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  GLfloat specularLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  GLfloat position[][4] = { {-3.0f, 3.0f, 5.0f, 1.0f}, {3.0f, 3.0f, 5.0f, 1.0f} };
 
   glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
