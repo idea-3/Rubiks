@@ -18,7 +18,8 @@ char keyPressed;
 int rotationSign = 0;
 int rubiksColor[6][9];
 int angleX = 0, angleY = 0, angleZ = 0;
-bool rotationComplete = true;
+int xRot = 25, yRot = -30, xDiff = 0, yDiff = 0;
+bool rotationComplete = true, mouseDown = false;
 
 /* 
   PANDUAN MENGGAMBAR
@@ -55,7 +56,7 @@ void drawSquare(GLfloat P1[], GLfloat P2[], GLfloat P3[], GLfloat P4[], int colo
   // Membuat kotak
   float specReflection[] = { 0.3f, 0.3f, 0.3f, 0.1f };
   glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
-  glMateriali(GL_FRONT, GL_SHININESS, 20);
+  glMateriali(GL_FRONT, GL_SHININESS, 2);
 
   glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
   glColor3fv(color[colorIndex]);
@@ -177,8 +178,8 @@ void drawRubiks() {
     for (int j = 0; j < 3; j++) {
       for (int k = 0; k < 3; k++) {
         glLoadIdentity();
-        glRotatef(25+angleX,1,0,0);
-        glRotatef(-30+angleY,0,1,0);
+        glRotatef(xRot+angleX,1,0,0);
+        glRotatef(yRot+angleY,0,1,0);
         glRotatef(angleZ,0,0,1);
         switch (keyPressed) {
           case 'q':
@@ -674,6 +675,48 @@ void keyboardFunc(unsigned char key, int x, int y) {
   }
 }
 
+void mouse(int button, int state, int x, int y) {
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    mouseDown = true;
+    xDiff = x - yRot;
+    yDiff = -y + xRot;
+  } else {
+    mouseDown = false; 
+  }
+}
+
+void mouseMotion(int x, int y) {
+  if (mouseDown) {
+    xRot = y + yDiff;
+    yRot = x - xDiff;
+    glutPostRedisplay();
+  }
+}
+
+// Membuat lighting
+void addLighting() {
+  glShadeModel(GL_SMOOTH);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  glEnable(GL_LIGHT1);
+  glEnable(GL_COLOR_MATERIAL);
+
+  GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+  GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
+  GLfloat specularLight[] = { 0.1f, 0.1f, 0.1f, 0.5f };
+  GLfloat position[][4] = { {3.5f, 3.5f, 0.0f, 1.0f}, {-3.5f, -3.5f, 0.0f, 1.0f} };
+
+  glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+  glLightfv(GL_LIGHT0, GL_POSITION, position[0]);
+
+  glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight);
+  glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight);
+  glLightfv(GL_LIGHT1, GL_POSITION, position[1]);
+}
+
 int main(int argc, char** argv) {
   initiateRubiksColor();
   glutInit(&argc, argv);
@@ -684,22 +727,10 @@ int main(int argc, char** argv) {
   glutReshapeFunc(reshape);
   glutDisplayFunc(display);
   glutKeyboardFunc(keyboardFunc);
+  glutMouseFunc(mouse);
+  glutMotionFunc(mouseMotion);
 
-
-  glShadeModel(GL_SMOOTH);
-  glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
-  glEnable(GL_COLOR_MATERIAL);
-
-  GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-  GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
-  GLfloat specularLight[] = { 0.1f, 0.1f, 0.1f, 0.5f };
-  GLfloat position[] = { 3.0f, 0.0f, 3.0f, 1.0f };
-
-  glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-  glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-  glLightfv(GL_LIGHT0, GL_POSITION, position);
+  addLighting();
 
   glEnable(GL_DEPTH_TEST);
   glutMainLoop();
