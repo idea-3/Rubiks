@@ -16,14 +16,22 @@ GLfloat color[][3]={{1.0,1.0,1.0},  // White
                     {1.0,0.0,0.0},  // Red
                     {0.5,0.5,0.5} // Grey
 };
+GLfloat lightColor[][3]={{1.0,1.0,1.0},
+                        {0.3,0.0,0.0},
+                        {0.0,0.3,0.0},
+                        {0.0,0.0,0.3},
+                        {0.0,0.0,0.0}
+};
 GLfloat theta = 0;
 char keyPressed;
 int rotationSign = 0;
 int rubiksColor[6][9];
 int angleX = 0, angleY = 0, angleZ = 0;
 int xRot = 0, yRot = 0, xDiff = 0, yDiff = 0;
+int lightColorIndex = 0;
 int movementIndex = -1;
 bool rotationComplete = true, mouseDown = false, isSolving = false;
+float rLight = lightColor[lightColorIndex][0], gLight = lightColor[lightColorIndex][1], bLight = lightColor[lightColorIndex][2];
 vector<char> movement;
 
 /* 
@@ -59,9 +67,9 @@ void drawSquare(GLfloat P1[], GLfloat P2[], GLfloat P3[], GLfloat P4[], int colo
   glVertex3fv(P4);
   glEnd();
   // Membuat kotak
-  float specReflection[] = { 0.3f, 0.3f, 0.3f, 0.1f };
+  float specReflection[] = { 1.0f, 1.0f, 1.0f, 0.1f };
   glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
-  glMateriali(GL_FRONT, GL_SHININESS, 2);
+  glMateriali(GL_FRONT, GL_SHININESS, 128);
 
   glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
   glColor3fv(color[colorIndex]);
@@ -267,10 +275,35 @@ void reshape(int width, int height) {
   glMatrixMode(GL_MODELVIEW);
 }
 
+// Membuat lighting
+void addLighting() {
+  glShadeModel(GL_SMOOTH);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  glEnable(GL_LIGHT1);
+  glEnable(GL_COLOR_MATERIAL);
+
+  GLfloat ambientLight[] = { 0.1f, 0.1f, 0.1f };
+  GLfloat diffuseLight[] = { rLight, gLight, bLight };
+  GLfloat specularLight[] = { rLight, gLight, bLight };
+  GLfloat position[][4] = { {-3.0f, 3.0f, 5.0f, 1.0f}, {3.0f, 3.0f, 5.0f, 1.0f} };
+
+  glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+  glLightfv(GL_LIGHT0, GL_POSITION, position[0]);
+
+  glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight);
+  glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight);
+  glLightfv(GL_LIGHT1, GL_POSITION, position[1]);
+}
+
 void display() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
   glPushMatrix();
+  addLighting();
   drawRubiks();
   glPopMatrix();
   glFlush();
@@ -683,6 +716,28 @@ void keyboardFunc(unsigned char key, int x, int y) {
       angleZ -= 5;
       glutPostRedisplay();
       break;
+    case '=':
+      rLight += 0.1f;
+      gLight += 0.1f;
+      bLight += 0.1f;
+      glutPostRedisplay();
+      break;
+    case '-':
+      rLight -= 0.1f;
+      gLight -= 0.1f;
+      bLight -= 0.1f;
+      glutPostRedisplay();
+      break;
+    case '`':
+      if (lightColorIndex == 4) {
+        lightColorIndex = 0;
+      } else {
+        lightColorIndex++;
+      }
+      rLight = lightColor[lightColorIndex][0];
+      gLight = lightColor[lightColorIndex][1];
+      bLight = lightColor[lightColorIndex][2];
+      break;
     case 'q':
     case 'w':
     case 'e':
@@ -721,30 +776,6 @@ void mouseMotion(int x, int y) {
     yRot = x - xDiff;
     glutPostRedisplay();
   }
-}
-
-// Membuat lighting
-void addLighting() {
-  glShadeModel(GL_SMOOTH);
-  glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
-  glEnable(GL_LIGHT1);
-  glEnable(GL_COLOR_MATERIAL);
-
-  GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-  GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
-  GLfloat specularLight[] = { 1.0f, 1.0f, 1.0f, 0.5f };
-  GLfloat position[][4] = { {0.0f, 4.0f, 0.0f, 1.0f}, {0.0f, -4.0f, 0.0f, 1.0f} };
-
-  glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-  glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-  glLightfv(GL_LIGHT0, GL_POSITION, position[0]);
-
-  glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight);
-  glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight);
-  glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight);
-  glLightfv(GL_LIGHT1, GL_POSITION, position[1]);
 }
 
 int main(int argc, char** argv) {
