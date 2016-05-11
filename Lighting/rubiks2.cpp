@@ -18,7 +18,7 @@ char keyPressed;
 int rotationSign = 0;
 int rubiksColor[6][9];
 int angleX = 0, angleY = 0, angleZ = 0;
-int xRot = 25, yRot = -30, xDiff = 0, yDiff = 0;
+int xRot = 0, yRot = 0, xDiff = 0, yDiff = 0;
 bool rotationComplete = true, mouseDown = false;
 
 /* 
@@ -47,7 +47,7 @@ void drawSquare(GLfloat P1[], GLfloat P2[], GLfloat P3[], GLfloat P4[], int colo
   glColor3f(0, 0, 0);
   glLineWidth(lineWidth);
   glBegin(GL_LINE_LOOP);
-  glNormal3f(normal[0]+P1[0], normal[1]+P1[1], normal[2]+P1[2]);
+  // glNormal3f(normal[0], normal[1], normal[2]);
   glVertex3fv(P1);
   glVertex3fv(P2);
   glVertex3fv(P3);
@@ -58,11 +58,11 @@ void drawSquare(GLfloat P1[], GLfloat P2[], GLfloat P3[], GLfloat P4[], int colo
   glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
   glMateriali(GL_FRONT, GL_SHININESS, 2);
 
-  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+  // glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
   glColor3fv(color[colorIndex]);
   glBegin(GL_POLYGON);
 
-  glNormal3f(normal[0]+P1[0], normal[1]+P1[1], normal[2]+P1[2]);
+  glNormal3f(normal[0], normal[1], normal[2]);
   glVertex3fv(P1);
   glVertex3fv(P2);
   glVertex3fv(P3);
@@ -83,6 +83,7 @@ void drawCube(int i, int j, int k) {
   if (k == 0) {
     //glNormal3f(0, 0, 1);
     GLfloat normal[] = {0, 0, 1};
+    // GLfloat* normal = countNormal(P1, P2, P3, P4);
     drawSquare(P1,P2,P3,P4,rubiksColor[2][i + j * 3], normal);
   } else {
     GLfloat normal[] = {0, 0, 0};
@@ -146,7 +147,7 @@ void drawCube(int i, int j, int k) {
   P3[0] -= squareSize;
   if (i == 0) {
     // glNormal3f(1, 0, 0);
-    GLfloat normal[] = {1, 0, 0};
+    GLfloat normal[] = {-1, 0, 0};
     drawSquare(P1,P2,P3,P4,rubiksColor[4][k + j * 3], normal);
   } else {
     GLfloat normal[] = {0, 0, 0};
@@ -703,8 +704,8 @@ void addLighting() {
 
   GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
   GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
-  GLfloat specularLight[] = { 0.1f, 0.1f, 0.1f, 0.5f };
-  GLfloat position[][4] = { {3.5f, 3.5f, 0.0f, 1.0f}, {-3.5f, -3.5f, 0.0f, 1.0f} };
+  GLfloat specularLight[] = { 1.0f, 1.0f, 1.0f, 0.5f };
+  GLfloat position[][4] = { {0.0f, 4.0f, 0.0f, 1.0f}, {0.0f, -4.0f, 0.0f, 1.0f} };
 
   glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
