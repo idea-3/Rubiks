@@ -3,6 +3,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <GL/glut.h>
+#include <vector>
+
+using namespace std;
 
 GLfloat squareSize = 2, lineWidth = 10;
 GLfloat color[][3]={{1.0,1.0,1.0},  // White
@@ -19,7 +22,9 @@ int rotationSign = 0;
 int rubiksColor[6][9];
 int angleX = 0, angleY = 0, angleZ = 0;
 int xRot = 0, yRot = 0, xDiff = 0, yDiff = 0;
-bool rotationComplete = true, mouseDown = false;
+int movementIndex = -1;
+bool rotationComplete = true, mouseDown = false, isSolving = false;
+vector<char> movement;
 
 /* 
   PANDUAN MENGGAMBAR
@@ -58,7 +63,7 @@ void drawSquare(GLfloat P1[], GLfloat P2[], GLfloat P3[], GLfloat P4[], int colo
   glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
   glMateriali(GL_FRONT, GL_SHININESS, 2);
 
-  // glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
   glColor3fv(color[colorIndex]);
   glBegin(GL_POLYGON);
 
@@ -520,8 +525,53 @@ void rotateRight() {
   rubiksColor[2][2] = temp[2];
 }
 
+void reverseMovement() {
+  switch (movement[movementIndex]) {
+      case 'q':
+      keyPressed = 'w';
+      break;
+    case 'w':
+      keyPressed = 'q';
+      break;
+    case 'e':
+      keyPressed = 'r';
+      break;
+    case 'r':
+      keyPressed = 'e';
+      break;
+    case 'a':
+      keyPressed = 's';
+      break;
+    case 's':
+      keyPressed = 'a';
+      break;
+    case 'd':
+      keyPressed = 'f';
+      break;
+    case 'f':
+      keyPressed = 'd';
+      break;
+    case 'z':
+      keyPressed = 'x';
+      break;
+    case 'x':
+      keyPressed = 'z';
+      break;
+    case 'c':
+      keyPressed = 'v';
+      break;
+    case 'v':
+      keyPressed = 'c';
+      break;
+    }
+}
+
 // Memutar bagian rubiks sesuai masukkan keyboard pengguna
 void rotate() {
+  if (theta == 0 && isSolving) {
+    reverseMovement();
+  }
+
   theta += 0.5;
 
   if (theta == 360) {
@@ -529,8 +579,19 @@ void rotate() {
   }
 
   if (theta >= 90) {
-    rotationComplete = true;
-    glutIdleFunc(NULL);
+    if (!isSolving) {
+      rotationComplete = true;
+      movement.push_back(keyPressed);
+      glutIdleFunc(NULL);
+    } else {
+      if (movementIndex == 0) {
+        rotationComplete = true;
+        movement.clear();
+        isSolving = false;
+        glutIdleFunc(NULL);
+      }
+      movementIndex--;
+    }
     switch (keyPressed) {
       case 'q':
         rotateTop();
@@ -586,6 +647,15 @@ void rotate() {
   glutPostRedisplay();
 }
 
+void solveRubiks() {
+  if (!movement.empty()) {
+    movementIndex = movement.size() - 1;
+    isSolving = true;
+    rotationComplete = false;
+    glutIdleFunc(rotate);
+  }
+}
+
 // Memutar bagian rubiks dan memutar seluruh bagian rubiks sesuai masukkan pengguna
 void keyboardFunc(unsigned char key, int x, int y) {
   switch (key) {
@@ -614,64 +684,23 @@ void keyboardFunc(unsigned char key, int x, int y) {
       glutPostRedisplay();
       break;
     case 'q':
-      keyPressed = 'q';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
-      break;
     case 'w':
-      keyPressed = 'w';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
-      break;
     case 'e':
-      keyPressed = 'e';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
-      break;
     case 'r':
-      keyPressed = 'r';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
-      break;
     case 'a':
-      keyPressed = 'a';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
-      break;
     case 's':
-      keyPressed = 's';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
-      break;
     case 'd':
-      keyPressed = 'd';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
-      break;
     case 'f':
-      keyPressed = 'f';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
-      break;
     case 'z':
-      keyPressed = 'z';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
-      break;
     case 'x':
-      keyPressed = 'x';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
-      break;
     case 'c':
-      keyPressed = 'c';
+    case 'v':
+      keyPressed = key;
       rotationComplete = false;
       glutIdleFunc(rotate);
       break;
-    case 'v':
-      keyPressed = 'v';
-      rotationComplete = false;
-      glutIdleFunc(rotate);
+    case '0':
+      solveRubiks();
       break;
   }
 }
