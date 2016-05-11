@@ -13,14 +13,21 @@ GLfloat color[][3]={{1.0,1.0,1.0},  // White
                     {1.0,0.0,0.0},  // Red
                     {0.5,0.5,0.5} // Grey
 };
+GLfloat lightColor[][3]={{1.0,1.0,1.0},
+                        {0.3,0.0,0.0},
+                        {0.0,0.3,0.0},
+                        {0.0,0.0,0.3},
+                        {0.0,0.0,0.0}
+};
 GLfloat theta = 0;
 char keyPressed;
 int rotationSign = 0;
 int rubiksColor[6][9];
 int angleX = 0, angleY = 0, angleZ = 0;
 int xRot = 0, yRot = 0, xDiff = 0, yDiff = 0;
+int lightColorIndex = 0;
 bool rotationComplete = true, mouseDown = false;
-float rLight = 1, gLight = 1, bLight = 1;
+float rLight = lightColor[lightColorIndex][0], gLight = lightColor[lightColorIndex][1], bLight = lightColor[lightColorIndex][2];
 
 /* 
   PANDUAN MENGGAMBAR
@@ -650,6 +657,16 @@ void keyboardFunc(unsigned char key, int x, int y) {
       gLight -= 0.1f;
       bLight -= 0.1f;
       glutPostRedisplay();
+      break;
+    case '`':
+      if (lightColorIndex == 4) {
+        lightColorIndex = 0;
+      } else {
+        lightColorIndex++;
+      }
+      rLight = lightColor[lightColorIndex][0];
+      gLight = lightColor[lightColorIndex][1];
+      bLight = lightColor[lightColorIndex][2];
       break;
     case 'q':
       keyPressed = 'q';
