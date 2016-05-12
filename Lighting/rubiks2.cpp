@@ -737,6 +737,7 @@ void keyboardFunc(unsigned char key, int x, int y) {
       rLight = lightColor[lightColorIndex][0];
       gLight = lightColor[lightColorIndex][1];
       bLight = lightColor[lightColorIndex][2];
+      glutPostRedisplay();
       break;
     case 'q':
     case 'w':
@@ -757,6 +758,30 @@ void keyboardFunc(unsigned char key, int x, int y) {
     case '0':
       solveRubiks();
       break;
+    case 't':
+      rLight += 0.2;
+      glutPostRedisplay();
+      break;
+    case 'y':
+      rLight -= 0.2;
+      glutPostRedisplay();
+      break;
+    case 'g':
+      gLight += 0.2;
+      glutPostRedisplay();
+      break;
+    case 'h':
+      gLight -= 0.2;
+      glutPostRedisplay();
+      break;
+    case 'b':
+      bLight += 0.2;
+      glutPostRedisplay();
+      break;
+    case 'n':
+      bLight -= 0.2;
+      glutPostRedisplay();
+      break;  
   }
 }
 
