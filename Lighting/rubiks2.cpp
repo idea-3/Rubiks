@@ -614,7 +614,97 @@ void rotate() {
   if (theta >= 90) {
     if (!isSolving) {
       rotationComplete = true;
-      movement.push_back(keyPressed);
+      if (!movement.empty()) {
+        int lastIndex = movement.size() - 1;
+        switch (keyPressed) {
+          case 'q':
+            if (movement[lastIndex] != 'w') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 'w':
+            if (movement[lastIndex] != 'q') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 'e':
+            if (movement[lastIndex] != 'r') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 'r':
+            if (movement[lastIndex] != 'e') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 'a':
+            if (movement[lastIndex] != 's') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 's':
+            if (movement[lastIndex] != 'a') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 'd':
+            if (movement[lastIndex] != 'f') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 'f':
+            if (movement[lastIndex] != 'd') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 'z':
+            if (movement[lastIndex] != 'x') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 'x':
+            if (movement[lastIndex] != 'z') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 'c':
+            if (movement[lastIndex] != 'v') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+          case 'v':
+            if (movement[lastIndex] != 'c') {
+              movement.push_back(keyPressed);
+            } else {
+              movement.pop_back();
+            }
+            break;
+        }
+      } else {
+        movement.push_back(keyPressed);
+      }
       glutIdleFunc(NULL);
     } else {
       if (movementIndex == 0) {
